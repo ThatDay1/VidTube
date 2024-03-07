@@ -1,97 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './Recommended.css'
-import thumbail1 from '../../assets/thumbnail1.png'
-import thumbail2 from '../../assets/thumbnail2.png'
-import thumbail3 from '../../assets/thumbnail3.png'
-import thumbail4 from '../../assets/thumbnail4.png'
-import thumbail5 from '../../assets/thumbnail5.png'
-import thumbail6 from '../../assets/thumbnail6.png'
-import thumbail7 from '../../assets/thumbnail7.png'
-import thumbail8 from '../../assets/thumbnail8.png'
+import { API_KEY, value_converter } from '../../data'
+import { Link } from 'react-router-dom'
 
-const Recommended = () => {
+const Recommended = ({ categoryId }) => {
+  const [apiData, setApiData] = useState([])
+
+  const fetchData = async () => {
+    const relatedVideo_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=45&regionCode=US&videoCategoryId=${categoryId}&key=${API_KEY}`
+    await fetch(relatedVideo_url)
+      .then((res) => res.json())
+      .then((data) => setApiData(data.items))
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
   return (
     <div className="recommended">
-      <div className="side-video-list">
-        <img src={thumbail1} alt="user 1" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail2} alt="user 2" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail3} alt="user 3" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail4} alt="user 4" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail5} alt="user 5" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail6} alt="user 6" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail7} alt="user 7" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
-      <div className="side-video-list">
-        <img src={thumbail8} alt="user 8" />
-        <div className="vid-info">
-          <h4>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus
-          </h4>
-          <p>loremTitle</p>
-          <p>199K Views</p>
-        </div>
-      </div>
+      {apiData.map((item, index) => {
+        return (
+          <Link
+            to={`/video/${item.snippet.categoryId}/${item.id}`}
+            key={index}
+            className="side-video-list"
+          >
+            <img src={item.snippet.thumbnails.medium.url} alt="user" />
+            <div className="vid-info">
+              <h4>{item.snippet.title}</h4>
+              <p>{item.snippet.channelTitle}</p>
+              <p>{value_converter(item.statistics.viewCount)} Views</p>
+            </div>
+          </Link>
+        )
+      })}
     </div>
   )
 }
